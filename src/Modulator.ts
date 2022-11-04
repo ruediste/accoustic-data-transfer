@@ -12,8 +12,8 @@ export class FskModulator implements Modulator {
   factor = 1;
   bitDuration = 0.5 / this.factor;
   rampDuration = 0.01 / this.factor;
-  lowFrequency = 261.63 * this.factor;
-  highFrequency = 329.63 * this.factor;
+  lowFrequency = 10 * 261.63 * this.factor;
+  highFrequency = 10 * 329.63 * this.factor;
 
   send(value: string): void {
     if (value === "") return;

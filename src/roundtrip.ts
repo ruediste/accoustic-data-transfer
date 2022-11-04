@@ -5,6 +5,9 @@ export function performRoundtrip() {
   const modulator = new FskModulator();
   const demodulator = new FskDemodulator();
 
+  const ffts: Float32Array[] = [];
+  demodulator.onFft = (fft) => ffts.push(fft);
+
   const input = "A";
   let result = "";
   modulator.send(input);
@@ -16,5 +19,5 @@ export function performRoundtrip() {
     }
   }
   console.log("Roundtrip Result", result);
-  return demodulator.ffts;
+  return ffts;
 }

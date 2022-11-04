@@ -1,6 +1,6 @@
 import { FskModulator } from "./Modulator";
 
-const audioCtx = new window.AudioContext();
+let audioCtx: AudioContext;
 const modulator = new FskModulator();
 let initialized = false;
 
@@ -8,6 +8,7 @@ export async function workletPlayback(value: string) {
   modulator.send(value);
 
   if (!initialized) {
+    audioCtx = new AudioContext();
     initialized = true;
     await audioCtx.audioWorklet.addModule("output.worklet.js");
     const source = new AudioWorkletNode(audioCtx, "output.worklet");

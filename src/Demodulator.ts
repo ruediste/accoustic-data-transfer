@@ -9,7 +9,8 @@ export class FskDemodulator implements Demodulator {
   out = this.fft.createComplexArray();
 
   amplitudes!: Float32Array;
-  ffts: Float32Array[] = [];
+  onFft: (fft: Float32Array) => void = (value) => {};
+
   process(chunk: Float32Array) {
     this.fft.realTransform(this.out, chunk);
     this.amplitudes = new Float32Array(1024);
@@ -19,7 +20,7 @@ export class FskDemodulator implements Demodulator {
       for (let p = 0; p < 4; p++) value += this.out[i4 + p] * this.out[i4 + p];
       this.amplitudes[i] = Math.log(1 + value / 2);
     }
-    this.ffts.push(this.amplitudes);
+    this.onFft(this.amplitudes);
     return undefined;
   }
 }
