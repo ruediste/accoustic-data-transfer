@@ -1,5 +1,5 @@
 import "./App.css";
-import { startRecorderProcessorInput } from "./audioWorkletProcessor";
+import { startRecorderProcessorInput } from "./workletRecorder";
 import { startPlayback } from "./audioBufferPlayer";
 import { workletPlayback } from "./workletPlayback";
 import { useState } from "react";
