@@ -9,20 +9,12 @@ function doRoundtrip(canvas: HTMLCanvasElement) {
   const ffts = performRoundtrip();
   const ctx = canvas.getContext("2d")!;
   const imageData = ctx.createImageData(1024, 100);
-  const max = Math.max(
-    ...ffts.map((x) =>
-      x.reduce(
-        (p, e) => (p === undefined ? e : Math.max(p, e)),
-        Number.NEGATIVE_INFINITY
-      )
-    )
-  );
 
   // Iterate through every pixel
   for (let y = 0; y < 100 && y < ffts.length; y++) {
     for (let x = 0; x < 1024; x++) {
       const i = 4 * (y * 1024 + x);
-      const value = (255 * ffts[y][x]) / max;
+      const value = (255 * ffts[y][x]);
       imageData.data[i + 0] = value; // R value
       imageData.data[i + 1] = value; // G value
       imageData.data[i + 2] = value; // B value

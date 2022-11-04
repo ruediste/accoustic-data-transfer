@@ -24,7 +24,7 @@ export class FskModulator implements Modulator {
   }
 
   produceChunk(sampleRate: number): Float32Array {
-    const chunk = new Float32Array(4096);
+    const chunk = new Float32Array(2048);
     const sampleTime = 1 / sampleRate;
     let idx = 0;
     while (true) {

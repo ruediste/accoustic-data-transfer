@@ -22,7 +22,7 @@ export function startRecorder(): void {
         mediaStreamSource.connect(recorder).connect(audioContext.destination);
 
         recorder.port.onmessage = (event: { data: Float32Array }) => {
-          const decoded = demodulator.process(event.data);
+          const decoded = demodulator.process(event.data, audioContext.sampleRate);
           if (decoded !== undefined) {
             console.log(decoded);
           }
