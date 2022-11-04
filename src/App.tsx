@@ -32,13 +32,13 @@ function doRoundtrip(canvas: HTMLCanvasElement) {
   }
 
   // Draw image data to the canvas
-  ctx.putImageData(imageData, 20, 20);
+  ctx.putImageData(imageData, 0, 0);
 }
 function App() {
   const [input, setInput] = useState("Hello");
   const canvasRef = useRef<HTMLCanvasElement>();
   return (
-    <div className="App">
+    <div className="App" style={{ backgroundColor: "blue" }}>
       <button onClick={() => startRecorderProcessorInput()}>
         Start Recording
       </button>
@@ -55,7 +55,7 @@ function App() {
       <canvas
         width={1024}
         height={100}
-        style={{ height: 200 }}
+        style={{ width: "99%" }}
         ref={(e) => {
           if (e != null) canvasRef.current = e;
         }}

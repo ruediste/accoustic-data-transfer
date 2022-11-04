@@ -14,10 +14,10 @@ export class FskDemodulator implements Demodulator {
     this.fft.realTransform(this.out, chunk);
     this.amplitudes = new Float32Array(1024);
     for (let i = 0; i < this.amplitudes.length; i++) {
-      const i8 = i * 8;
+      const i4 = i * 4;
       let value = 0;
-      for (let p = 0; p < 8; p++) value += this.out[i8 + p] * this.out[i8 + p];
-      this.amplitudes[i] = value / 4;
+      for (let p = 0; p < 4; p++) value += this.out[i4 + p] * this.out[i4 + p];
+      this.amplitudes[i] = Math.log(1 + value / 2);
     }
     this.ffts.push(this.amplitudes);
     return undefined;

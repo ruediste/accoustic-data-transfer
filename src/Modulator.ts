@@ -9,9 +9,9 @@ export class FskModulator implements Modulator {
   bitIndex: number = 0;
   bitTime: number = 0;
 
-  factor = 10;
-  bitDuration = 10 / this.factor;
-  rampDuration = 1 / 100 / this.factor;
+  factor = 1;
+  bitDuration = 0.5 / this.factor;
+  rampDuration = 0.01 / this.factor;
   lowFrequency = 261.63 * this.factor;
   highFrequency = 329.63 * this.factor;
 
@@ -44,6 +44,8 @@ export class FskModulator implements Modulator {
               2 *
               (bitValue ? this.highFrequency : this.lowFrequency)
           );
+
+          // ramp calculation
           if (this.bitTime < this.rampDuration) {
             value *= this.bitTime / this.rampDuration;
           }
