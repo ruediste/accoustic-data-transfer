@@ -5,10 +5,10 @@ export function performRoundtrip() {
   const modulator = new FskModulator();
   const demodulator = new FskDemodulator();
 
-  const input = "Hello";
+  const input = "A";
   let result = "";
   modulator.send(input);
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 100; i++) {
     const chunk = modulator.produceChunk(44000);
     const decoded = demodulator.process(chunk);
     if (decoded !== undefined) {
@@ -16,4 +16,5 @@ export function performRoundtrip() {
     }
   }
   console.log("Roundtrip Result", result);
+  return demodulator.ffts;
 }
