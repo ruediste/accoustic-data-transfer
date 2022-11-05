@@ -6,8 +6,15 @@ test("double samples",()=>
     expect(out.toString()).toBe([1,1,2,2,3,3,4,4,5,5,6,6].toString())
 });
 
-test("2/3 samples",()=>
+test("2:3 samples",()=>
 {
     let out:Float32Array=resample([1,2,3,4,5,6],2,3);
     expect(out.toString()).toBe([1,1,2,3,3,4,5,5,6].toString())
+});
+
+// downsampling is realy bad
+test("4:2 samples",()=>
+{
+    let out:Float32Array=resample([1,1,2,3,3,4,5,5,6],4,2);
+    expect(out.toString()).toBe([1,2,3,5,6].toString())
 });

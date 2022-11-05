@@ -38,7 +38,7 @@ export class DemodulatorFsk implements Demodulator {
       this.amplitudes[fftBinLowFrequency + 1] +
       this.amplitudes[fftBinLowFrequency - 1];
 
-    const symbolLogRation = Math.log(
+    const symbolLogRatio = Math.log(
       (energyHigh + Number.EPSILON) / (energyLow + Number.EPSILON)
     );
 
@@ -54,9 +54,9 @@ export class DemodulatorFsk implements Demodulator {
             settings.bitDuration
         ) +
         " SymbolV " +
-        (Math.abs(symbolLogRation) < settings.logRatioThreshold
+        (Math.abs(symbolLogRatio) < settings.logRatioThreshold
           ? 0
-          : Math.sign(symbolLogRation))
+          : Math.sign(symbolLogRatio))
     );
 
     ++this.processedChunks;
