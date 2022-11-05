@@ -1,7 +1,7 @@
-import { FskDemodulator } from "./Demodulator";
+import settings from "./settings";
 
 class WorkletRecorder {
-  demodulator = new FskDemodulator();
+  demodulator = settings.createDemodulator();
   audioContext!: AudioContext;
   initialized = false;
 

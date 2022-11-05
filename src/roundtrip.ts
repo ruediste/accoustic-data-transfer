@@ -1,9 +1,8 @@
-import { FskDemodulator } from "./Demodulator";
-import { FskModulator } from "./Modulator";
+import settings from "./settings";
 
 export function performRoundtrip() {
-  const modulator = new FskModulator();
-  const demodulator = new FskDemodulator();
+  const modulator = settings.createModulator();
+  const demodulator = settings.createDemodulator();
 
   const chunks: Float32Array[] = [];
 

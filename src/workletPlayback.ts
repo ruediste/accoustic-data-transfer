@@ -1,7 +1,7 @@
-import { FskModulator } from "./Modulator";
+import settings from "./settings";
 
 let audioCtx: AudioContext;
-const modulator = new FskModulator();
+const modulator = settings.createModulator();
 let initialized = false;
 
 export async function workletPlayback(value: string) {

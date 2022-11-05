@@ -101,7 +101,7 @@ function App() {
       <canvas
         width={1024}
         height={100}
-        style={{ width: "99%" }}
+        style={{ width: "99%", height: "800px" }}
         ref={(e) => {
           if (e != null) canvasRef.current = e;
         }}
