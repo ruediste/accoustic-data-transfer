@@ -1,6 +1,4 @@
 class OutputProcessor extends AudioWorkletProcessor {
-    bufferSize = 2048
-
     desiredChunkCount=5;
 
     chunks=[];

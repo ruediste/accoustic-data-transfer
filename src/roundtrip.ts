@@ -5,11 +5,7 @@ export function performRoundtrip() {
   const modulator = new FskModulator();
   const demodulator = new FskDemodulator();
 
-  const ffts: Float32Array[] = [];
-  demodulator.onFft = (fft, energyHigh, energyLow, symbolTime, symbolValue) => {
-    ffts.push(fft);
-    console.log("EH: " + energyHigh + " EL: " + energyLow + " SymbolT: " + symbolTime + " SymbolV " + symbolValue);
-  };
+  const chunks: Float32Array[] = [];
 
   const input = "ABC";
   let result = "";
@@ -24,11 +20,12 @@ export function performRoundtrip() {
 
   for (let i = 0; i < 100; i++) {
     const chunk = modulator.produceChunk(sampleRate);
+    chunks.push(chunk);
     const decoded = demodulator.process(chunk, sampleRate);
     if (decoded !== undefined) {
       result += decoded;
     }
   }
   console.log("Roundtrip Result", result);
-  return ffts;
+  return chunks;
 }
