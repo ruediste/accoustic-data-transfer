@@ -31,7 +31,7 @@ export function firBP(
     if (Aa <= 21) {
         alpha = 0;
     } else if (Aa <= 50) {
-        alpha = (0.5842 * ((Aa - 21) ^ 0.4)) + (0.07886 * (Aa - 21));
+        alpha = (0.5842 * (Math.pow((Aa - 21), 0.4))) + (0.07886 * (Aa - 21));
     } else {
         alpha = 0.1102 * (Aa - 8.7);
     }
@@ -51,7 +51,7 @@ export function firBP(
 
     const wk = new Float32Array(N);
     for (let n = -(N - 1) / 2; n < (N - 1) / 2; n++) {
-        let beta = alpha * (1 - (2 * n / (N - 1)) ^ 2) ^ 0.5;
+        let beta = alpha * Math.pow(Math.pow(1 - (2 * n / (N - 1)), 2), 0.5);
         let numerator = bessel(beta);
         let denominator = bessel(alpha);
         wk[n + (N - 1) / 2] = numerator / denominator;
@@ -73,7 +73,7 @@ function bessel(x: number) {
     let result = 0;
     let term = 10;
     while (term > Math.pow(10, (-6))) {
-        term = (((x / 2) ^ k) / (factorial(k))) ^ 2;
+        term = Math.pow(((Math.pow((x / 2), k)) / (factorial(k))), 2);
         result = result + term;
         k = k + 1;
     }
