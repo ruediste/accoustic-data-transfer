@@ -1,3 +1,6 @@
+import { constants } from 'buffer';
+import settings from './settings';
+
 export interface Modulator {
   send(value: string): void;
   produceChunk(sampleRate: number): Float32Array;
@@ -8,12 +11,6 @@ export class FskModulator implements Modulator {
   valueIndex: number = 0;
   bitIndex: number = 0;
   bitTime: number = 0;
-
-  factor = 1;
-  bitDuration = 0.5 / this.factor;
-  rampDuration = 0.01 / this.factor;
-  lowFrequency = 10 * 261.63 * this.factor;
-  highFrequency = 10 * 329.63 * this.factor;
 
   send(value: string): void {
     if (value === "") return;
@@ -42,24 +39,24 @@ export class FskModulator implements Modulator {
             this.bitTime *
               Math.PI *
               2 *
-              (bitValue ? this.highFrequency : this.lowFrequency)
+              (bitValue ? settings.highFrequency : settings.lowFrequency)
           );
 
           // ramp calculation
-          if (this.bitTime < this.rampDuration) {
-            value *= this.bitTime / this.rampDuration;
+          if (this.bitTime < settings.rampDuration) {
+            value *= this.bitTime / settings.rampDuration;
           }
           {
-            const remainingBitTime = this.bitDuration - this.bitTime;
-            if (remainingBitTime < this.rampDuration) {
-              value *= remainingBitTime / this.rampDuration;
+            const remainingBitTime = settings.bitDuration - this.bitTime;
+            if (remainingBitTime < settings.rampDuration) {
+              value *= remainingBitTime / settings.rampDuration;
             }
           }
         }
         chunk[idx] = value;
         idx++;
         this.bitTime += sampleTime;
-        if (this.bitTime >= this.bitDuration) {
+        if (this.bitTime >= settings.bitDuration) {
           this.bitIndex++;
           this.bitTime = 0;
           if (this.bitIndex >= 9) {

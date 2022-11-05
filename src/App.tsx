@@ -32,8 +32,8 @@ function App() {
   const [input, setInput] = useState("Hello");
   const canvasRef = useRef<HTMLCanvasElement>();
   useEffect(() => {
-    demodulator.onFft = (fft) => {
-      const ffts = performRoundtrip();
+    demodulator.onFft = (fft, energyHigh, energyLow, symbolTime, symbolValue) => {
+      console.log("EH: " + energyHigh + " EL: " + energyLow + " SymbolT: " + symbolTime + " SymbolV " + symbolValue);
       const ctx = canvasRef.current!.getContext("2d")!;
       const imageData = ctx.createImageData(1024, 1);
       const max = fft.reduce(
