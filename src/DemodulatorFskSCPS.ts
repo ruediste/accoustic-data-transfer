@@ -1,6 +1,8 @@
 import FFT from "fft.js";
 import { setSyntheticLeadingComments } from "typescript";
 import { Demodulator } from "./Demodulator";
+import { FirFilter } from "./dsp/FirFilter";
+import { firBP } from "./dsp/FirFilterDesiner";
 import settings from "./settings";
 
 function goertzel(x: Float32Array, k: number): { I: number; Q: number } {
@@ -37,6 +39,7 @@ class GapFinder implements Demodulator {
 
   gapFound = false;
   lastGapEndSampleNr = 0;
+  fir!: FirFilter;
 
   goertzelAmp(x: Float32Array, k: number): number {
     this.fft.realTransform(this.out, x);
@@ -47,6 +50,21 @@ class GapFinder implements Demodulator {
   }
 
   process(chunk: Float32Array, sampleRate: number) {
+    this.fir =
+      this.fir ??
+      new FirFilter(
+        firBP(
+          0.14,
+          52,
+          [
+            settings.lowFrequency - 200,
+            settings.lowFrequency,
+            settings.highFrequency,
+            settings.highFrequency + 200,
+          ],
+          sampleRate
+        )
+      );
     this.chunks.push(chunk);
 
     while (this.chunks.length > 1) {
@@ -58,25 +76,21 @@ class GapFinder implements Demodulator {
         settings.lowFrequency / (sampleRate / chunk.length)
       );
 
-      // fill buffer
-      {
-        let chunkIdx = 0;
-        let idx = this.currentSampleIndex;
-        for (let i = 0; i < chunkSize; i++) {
-          this.buffer[i] = this.chunks[chunkIdx][idx++];
-          if (idx >= chunkSize) {
-            idx = 0;
-            chunkIdx++;
-          }
-        }
-      }
-
       // perform goertzel
-      const al = this.goertzelAmp(this.buffer, fftBinHighFrequency);
-      const ah = this.goertzelAmp(this.buffer, fftBinHighFrequency);
+      const input = new Float32Array(1);
+      const o = new Float32Array(1);
+      input[0] = this.chunks[0][this.currentSampleIndex];
+      this.fir.filter(o, input);
+      const a = o[0];
+      console.log("s", this.currentSampleIndex, "a", a);
 
-      const newHasSignal =
-        al > this.amplitudeThreshold || ah > this.amplitudeThreshold;
+      // const al = this.goertzelAmp(this.buffer, fftBinHighFrequency);
+      // const ah = this.goertzelAmp(this.buffer, fftBinHighFrequency);
+
+      // const newHasSignal =
+      // al > this.amplitudeThreshold || ah > this.amplitudeThreshold;
+      const newHasSignal = a > this.amplitudeThreshold;
+
       if (this.hasSignal == true && newHasSignal == false) {
         this.gapStart = this.currentSampleNr;
       }

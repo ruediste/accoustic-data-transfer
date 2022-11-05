@@ -41,10 +41,11 @@ export class ModulatorFskSCPS implements Modulator {
       const rampSamples = chunk.length / 10;
       for (let i = 0; i < chunk.length; i++) {
         let value = Math.sin(
-          t *
+          (t *
             Math.PI *
             2 *
-            (bitValue ? settings.highFrequency : settings.lowFrequency)
+            (bitValue ? settings.highFrequency : settings.lowFrequency)) /
+            10
         );
 
         // ramp calculation

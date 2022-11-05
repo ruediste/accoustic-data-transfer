@@ -19,7 +19,7 @@ export function performRoundtrip() {
   modulator.produceChunk(sampleRate);
   modulator.produceChunk(sampleRate);
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 10; i++) {
     const chunk = modulator.produceChunk(sampleRate);
     chunks.push(chunk);
     const decoded = demodulator.process(chunk, sampleRate);
