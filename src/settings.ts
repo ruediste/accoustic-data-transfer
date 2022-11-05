@@ -1,4 +1,5 @@
 import { DemodulatorFsk } from "./DemodulatorFsk";
+import { DemodulatorFskSCPS } from "./DemodulatorFskSCPS";
 import { ModulatorFsk } from "./ModulatorFsk";
 import { ModulatorFskSCPS } from "./ModulatorFskSCPS";
 
@@ -9,7 +10,9 @@ const settings = {
   highFrequency: 18000,
   logRatioThreshold: 2.2,
 
-  createModulator: () => new ModulatorFsk(),
-  createDemodulator: () => new DemodulatorFsk(),
+  chunkSize: 2048,
+
+  createModulator: () => new ModulatorFskSCPS(),
+  createDemodulator: () => new DemodulatorFskSCPS(),
 };
 export default settings;

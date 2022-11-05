@@ -20,8 +20,6 @@ export class ModulatorFskSCPS implements Modulator {
 
     if (this.value === undefined) return chunk;
 
-    console.log(this.sendingStartBit, this.bitIndex, this.valueIndex);
-
     // the second start bit is just a gap
     if (this.sendingStartBit && this.bitIndex == 5) {
       this.sendingStartBit = false;
