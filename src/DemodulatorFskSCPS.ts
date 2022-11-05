@@ -42,23 +42,6 @@ export class DemodulatorFskSCPS implements Demodulator {
       (energyHigh + Number.EPSILON) / (energyLow + Number.EPSILON)
     );
 
-    console.log(
-      "EH: " +
-        energyHigh +
-        " EL: " +
-        energyLow +
-        " SymbolT: " +
-        Math.floor(
-          (this.processedChunks * chunk.length) /
-            sampleRate /
-            settings.bitDuration
-        ) +
-        " SymbolV " +
-        (Math.abs(symbolLogRation) < settings.logRatioThreshold
-          ? 0
-          : Math.sign(symbolLogRation))
-    );
-
     ++this.processedChunks;
     return undefined;
   }

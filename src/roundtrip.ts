@@ -1,8 +1,10 @@
+import { Demodulator } from "./Demodulator";
+import { Modulator } from "./Modulator";
 import settings from "./settings";
 
 export function performRoundtrip() {
-  const modulator = settings.createModulator();
-  const demodulator = settings.createDemodulator();
+  const modulator: Modulator = settings.createModulator();
+  const demodulator: Demodulator = settings.createDemodulator();
 
   const chunks: Float32Array[] = [];
 
