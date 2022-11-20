@@ -1,88 +1,90 @@
 export function firBP(
-    passbandRippleDB: number = 0.14,
-    stopBandAttenuation: number = 52,
-    filterEdge: number[],
-    sampleRate: number): Float32Array {
+    passbandRipple: number = 0.05 /* [dB] */,
+    stopBandAttenuation: number = 35  /* [dB] */,
+    filterEdge: number[]  /* (lower att freq, lower pass freq, upper pass freq, upper att freq) [Hz] */,
+    sampleRate: number /* Hz */): Float32Array {
 
-    // passbandRippleDB == Ap = 0.14; %dB maximum passband ripple
-    // stopBandAttenuation == Aadesirable = 52; % dB minimum stopband attenuation
+    const Ap = passbandRipple;
+    const Aa = stopBandAttenuation;
 
-    const Ap = passbandRippleDB;
-    const Aadesirable = stopBandAttenuation;
+    const faL = filterEdge[0]
+    const fpL = filterEdge[1]
+    const fpU = filterEdge[2]
+    const faU = filterEdge[3]
+    const fs = sampleRate
 
-    const wa1 = filterEdge[0] * 2 * Math.PI; // filterEdge[0]*2*Math.PI ==  wa1 = 400; % rad / s lower stopband edge
-    const wp1 = filterEdge[1] * 2 * Math.PI; // filterEdge[1]*2*Math.PI ==  wp1 = 500; % rad / s lower passband edge
-    const wp2 = filterEdge[2] * 2 * Math.PI; // filterEdge[2]*2*Math.PI ==  wp2 = 800; % rad / s upper passband edge
-    const wa2 = filterEdge[3] * 2 * Math.PI; // filterEdge[3]*2*Math.PI ==  wa2 = 950; % rad / s upper stopband edge
-    const ws = sampleRate * 2 * Math.PI;     // sampleRate*2*Math.PI == ws = 2400; % rad / s sampling frequency
-    const T = 1 / sampleRate;
+    const Bt = Math.min(fpL - faL, faU - fpU);
+    const fc1 = fpL - Bt / 2;
+    const fc2 = fpU + Bt / 2;
+    const T = 1 / fs;
 
-    const Bt = Math.min(wp1 - wa1, wa2 - wp2);
-    const wc1 = wp1 - Bt / 2;
-    const wc2 = wp2 + Bt / 2;
-
-    const dp = ((Math.pow(10, (0.05 * Ap))) - 1) / ((Math.pow(10, (0.05 * Ap))) + 1);
-    const da = Math.pow(10, (-0.05 * Aadesirable));
+    const dp = (Math.pow(10, Ap / 20) - 1) / (Math.pow(10, Ap / 20) + 1);
+    const da = Math.pow(10, -Aa / 20);
     const d = Math.min(dp, da);
 
-    const Aa = -20 * Math.log10(d);
+    const actualAa = -20 * Math.log10(d);
+
     let alpha;
     // kaiser window
-    if (Aa <= 21) {
+    if (actualAa <= 21) {
         alpha = 0;
-    } else if (Aa <= 50) {
-        alpha = (0.5842 * (Math.pow((Aa - 21), 0.4))) + (0.07886 * (Aa - 21));
+    } else if (actualAa <= 50) {
+        alpha = 0.5842 * Math.pow((actualAa - 21), 0.4) + 0.07886 * (actualAa - 21);
     } else {
-        alpha = 0.1102 * (Aa - 8.7);
-    }
-    let D;
-    if (Aa <= 21) {
-        D = 0.9222;
-    } else {
-        D = (Aa - 7.95) / 14.36;
+        alpha = 0.1102 * (actualAa - 8.7);
     }
 
-    let N = Math.ceil((ws * D / Bt) + 1);
+    let D;
+    if (actualAa <= 21) {
+        D = 0.9222;
+    } else {
+        D = (actualAa - 7.95) / 14.36;
+    }
+
+    let N = Math.ceil(fs * D / Bt + 1);
     if (N % 2 === 0) {
         N = N + 1;
     }
 
     console.log("Filter order: " + N);
 
-    const wk = new Float32Array(N);
-    for (let n = -(N - 1) / 2; n < (N - 1) / 2; n++) {
-        let beta = alpha * Math.pow(Math.pow(1 - (2 * n / (N - 1)), 2), 0.5);
+    const kaiserWindow = new Float32Array(N);
+    const denominator = bessel(alpha);
+    for (let n = -(N - 1) / 2; n <= (N - 1) / 2; n++) {
+        let beta = alpha * Math.sqrt(1 - Math.pow(Math.abs(2 * n / (N - 1)), 2));
         let numerator = bessel(beta);
-        let denominator = bessel(alpha);
-        wk[n + (N - 1) / 2] = numerator / denominator;
+        kaiserWindow[n + (N - 1) / 2] = numerator / denominator;
     }
 
     let h = new Float32Array(N);
-    for (let n = -(N - 1) / 2; n < (N - 1) / 2; n++) {
+    for (let n = -(N - 1) / 2; n <= (N - 1) / 2; n++) {
         if (n == 0) {
-            h[n + (N - 1) / 2 + 1] = (2 / ws) * (wc2 - wc1);
+            h[n + (N - 1) / 2] = (2 / fs) * (fc2 - fc1);
         } else {
-            h[n + (N - 1) / 2 + 1] = (1 / (n * Math.PI)) * (Math.sin(wc2 * n * T) - Math.sin(wc1 * n * T));
+            h[n + (N - 1) / 2] = (1 / (n * Math.PI)) * (Math.sin(2 * Math.PI * fc2 * n * T) - Math.sin(2 * Math.PI * fc1 * n * T));
         }
+
+        h[n + (N - 1) / 2] *= kaiserWindow[n + (N - 1) / 2];
     }
     return h;
 }
 
-function bessel(x: number) {
-    let k = 1;
+function bessel(x: number): number {
     let result = 0;
-    let term = 10;
-    while (term > Math.pow(10, (-6))) {
-        term = Math.pow(((Math.pow((x / 2), k)) / (factorial(k))), 2);
-        result = result + term;
-        k = k + 1;
+    let term = 1;
+    let k = 1;
+    while (term > Math.pow(10, -6)) {
+        result += term;
+        term = Math.pow(Math.pow(x / 2, k) / factorial(k), 2);
+        ++k;
     }
-    return result + 1;
+    return result;
 }
 
-function factorial(num: number) {
-    var rval = 1;
-    for (var i = 2; i <= num; i++)
-        rval = rval * i;
+function factorial(num: number): number {
+    let rval = 1;
+    for (let i = 2; i <= num; ++i) {
+        rval *= i;
+    }
     return rval;
 }

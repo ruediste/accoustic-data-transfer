@@ -11,7 +11,7 @@ export class FirFilter {
         for (let i = 0; i < outArray.length; i++) {
             this.filterTaps.copyWithin(1, 0);
             this.filterTaps[0] = inArray[i];
-            outArray[i] = this.filterTaps.reduce((previousValue, currentValue, currentIndex) => previousValue + currentValue * this.filterCoefficients[currentIndex]);
+            outArray[i] = this.filterTaps.reduce((previousValue, currentValue, currentIndex) => previousValue + currentValue * this.filterCoefficients[currentIndex], 0);
         }
     }
 }
